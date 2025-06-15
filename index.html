@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Midpoint Circle Octants – Horizontal Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 2px solid #222;
+            background-color: #fff;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .octant-box {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .octant-title {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Midpoint Circle Drawing – All Octants (Side by Side)</h2>
+    <canvas id="circleCanvas" width="300" height="300"></canvas>
+
+    <div class="grid" id="coordOutput"></div>
+
+    <script>
+        function drawPixel(ctx, x, y) {
+            ctx.fillRect(x, y, 1, 1);
+        }
+
+        function midPointCircleWithOctants(xc, yc, r) {
+            const canvas = document.getElementById('circleCanvas');
+            const ctx = canvas.getContext('2d');
+            const coordOutput = document.getElementById('coordOutput');
+            ctx.fillStyle = 'blue';
+
+            const octants = {
+                "Octant 1": [],
+                "Octant 2": [],
+                "Octant 3": [],
+                "Octant 4": [],
+                "Octant 5": [],
+                "Octant 6": [],
+                "Octant 7": [],
+                "Octant 8": []
+            };
+
+            let x = r;
+            let y = 0;
+            let p = 1 - r;
+
+            while (x >= y) {
+                const points = [
+                    { label: "Octant 1", point: [xc + x, yc + y] },
+                    { label: "Octant 2", point: [xc + y, yc + x] },
+                    { label: "Octant 3", point: [xc - y, yc + x] },
+                    { label: "Octant 4", point: [xc - x, yc + y] },
+                    { label: "Octant 5", point: [xc - x, yc - y] },
+                    { label: "Octant 6", point: [xc - y, yc - x] },
+                    { label: "Octant 7", point: [xc + y, yc - x] },
+                    { label: "Octant 8", point: [xc + x, yc - y] }
+                ];
+
+                points.forEach(({ label, point }) => {
+                    const [px, py] = point;
+                    drawPixel(ctx, px, py);
+                    octants[label].push(`(${px}, ${py})`);
+                });
+
+                y++;
+                if (p <= 0) {
+                    p += 2 * y + 1;
+                } else {
+                    x--;
+                    p += 2 * y - 2 * x + 1;
+                }
+            }
+
+            // Clear and render each octant as a box
+            coordOutput.innerHTML = '';
+            Object.entries(octants).forEach(([label, coords]) => {
+                const div = document.createElement('div');
+                div.className = 'octant-box';
+                div.innerHTML = `<div class="octant-title">${label}</div>${coords.join('<br>')}`;
+                coordOutput.appendChild(div);
+            });
+        }
+
+        midPointCircleWithOctants(150, 150, 50);
+    </script>
+</body>
+
+</html>
